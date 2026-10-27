@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071b14">
+<title>Administrador | Bolão do Pix</title>
+<style>
+:root{--bg:#06130f;--panel:#0d241b;--green:#19d782;--mint:#a7f3d0;--text:#f5fff9;--muted:#a8c6b7;--line:#214635;--gold:#ffcf65}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Arial,sans-serif;background:radial-gradient(ellipse at top,#123b28,#06130f 65%);color:var(--text);min-height:100vh}header{text-align:center;padding:24px 16px;border-bottom:1px solid var(--line)}header h1{margin:0;color:var(--green)}header p{color:var(--muted);margin:8px 0 0}main{max-width:900px;margin:auto;padding:18px 14px 40px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}label{display:block;margin:12px 0 6px;color:var(--mint)}input{width:100%;padding:13px;border-radius:10px;border:1px solid var(--line);background:#07170f;color:white;font:inherit}.btn{border:0;border-radius:10px;padding:12px 15px;margin:12px 8px 0 0;background:var(--green);color:#042015;font-weight:800;cursor:pointer}.secondary{background:#173b2b;color:var(--mint);border:1px solid #28593f}.note{font-size:.85rem;color:var(--muted);line-height:1.5}.warn{background:#332a12;border:1px solid #78612a;border-radius:10px;padding:12px;color:#ffdf8b;line-height:1.5}.hidden{display:none!important}.stats{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.stat{background:#08170f;border:1px solid var(--line);padding:12px;border-radius:10px;flex:1;min-width:120px}.stat b{display:block;font-size:1.4rem;color:var(--green)}.entry{padding:13px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.entry:last-child{border-bottom:0}.status{color:var(--gold);font-size:.82rem}a{color:var(--mint)}footer{text-align:center;padding:18px;color:var(--muted);font-size:.8rem}
+</style>
+</head>
+<body>
+<header><h1>🔐 Administrador</h1><p>Bolão do Pix · painel local de demonstração</p></header>
+<main>
+<div class="card">
+<h2>Entrar no painel</h2>
+<p class="note">Esta senha é apenas demonstrativa e não protege dados reais. Não use este protótipo para controlar pagamentos ou informações sensíveis.</p>
+<label for="pin">Senha demonstrativa</label><input id="pin" type="password" placeholder="Digite a senha" autocomplete="current-password">
+<button class="btn" id="login" type="button">Entrar</button>
+<p id="msg" class="note" aria-live="polite"></p>
+</div>
+<section id="panel" class="hidden">
+<div class="warn">Importante: este painel só mostra cadastros salvos no armazenamento local do mesmo navegador/dispositivo. Ele não recebe automaticamente inscrições feitas por outras pessoas. O Pix não está integrado e todos os pagamentos aparecem como pendentes.</div>
+<div class="stats"><div class="stat"><b id="count">0</b><span>Cadastros locais</span></div><div class="stat"><b>R$ 5,00</b><span>Valor previsto por entrada</span></div></div>
+<div class="card"><h2>Cadastros</h2><button class="btn" id="export" type="button">Exportar CSV</button><button class="btn secondary" id="refresh" type="button">Atualizar lista</button><div id="entries" class="note"></div></div>
+</section>
+<p><a href="./index.html">← Voltar para a página principal</a></p>
+</main>
+<footer>Bolão do Pix · Protótipo inicial</footer>
+<script>
+(()=>{const KEY='bolaoPixDemo_v1';const $=id=>document.getElementById(id);const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}};const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function render(){const a=read();$('count').textContent=a.length;$('entries').innerHTML=a.length?a.map(x=>'<div class="entry"><b>'+esc(x.name)+'</b><br>WhatsApp: '+esc(x.whatsapp)+'<br>Evento: '+esc(x.match)+'<br>Palpite: '+esc(x.guess)+'<br>Valor previsto: R$ 5,00 · <span class="status">Pagamento pendente</span><br><small>'+esc(x.createdAt||'')+'</small></div>').join(''):'Nenhum cadastro encontrado neste navegador.'}
+$('login').addEventListener('click',()=>{if($('pin').value!=='1234'){$('msg').textContent='Senha incorreta.';return}$('panel').classList.remove('hidden');$('msg').textContent='Acesso demonstrativo liberado.';render()});$('refresh').addEventListener('click',render);$('export').addEventListener('click',()=>{const a=read();const rows=[['Nome','WhatsApp','Evento','Palpite','Valor previsto','Pagamento','Data'],...a.map(x=>[x.name,x.whatsapp,x.match,x.guess,'5.00','Pendente',x.createdAt||''])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='cadastros-bolao-pix.csv';link.click();URL.revokeObjectURL(url)});})();
+</script>
+</body></html>
